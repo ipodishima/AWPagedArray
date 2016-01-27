@@ -29,7 +29,7 @@
 /**
  * This class acts as a proxy for NSArray, when data is loaded in batches, called "pages".
  * @discussion The recommendation is to use this class in conjunction with a data controller class which populates the paged array with pages of data, while casting the paged array back as an NSArray to its owner.
- * 
+ *
  * This class is inspired by NSFetchRequest's batching mechanism which returns a custom NSArray subclass.
  * @see NSFetchRequest fetchBatchSize
  */
@@ -39,12 +39,12 @@
  * The designated initializer for this class
  * Note that the parameters are part of immutable state
  */
-- (instancetype)initWithCount:(NSUInteger)count objectsPerPage:(NSUInteger)objectsPerPage initialPageIndex:(NSInteger)initialPageIndex;
+- (instancetype)initWithCount:(NSUInteger)count maxObjectsPerPage:(NSUInteger)maxObjectsPerPage initialPageIndex:(NSInteger)initialPageIndex;
 
 /**
  * Convenience initializer with initialPageIndex = 1
  */
-- (instancetype)initWithCount:(NSUInteger)count objectsPerPage:(NSUInteger)objectsPerPage;
+- (instancetype)initWithCount:(NSUInteger)count maxObjectsPerPage:(NSUInteger)maxObjectsPerPage;
 
 /**
  * Sets objects for a specific page in the array
@@ -58,7 +58,7 @@
 - (NSUInteger)pageForIndex:(NSUInteger)index;
 - (NSIndexSet *)indexSetForPage:(NSUInteger)page;
 
-@property (nonatomic, readonly) NSUInteger objectsPerPage;
+@property (nonatomic, readonly) NSUInteger maxObjectsPerPage;
 @property (nonatomic, readonly) NSUInteger numberOfPages;
 @property (nonatomic, readonly) NSInteger initialPageIndex;
 

@@ -34,7 +34,7 @@ const NSUInteger DataProviderDataCount = 200;
 
     self = [super init];
     if (self) {
-        _pagedArray = [[AWPagedArray alloc] initWithCount:DataProviderDataCount objectsPerPage:pageSize];
+        _pagedArray = [[AWPagedArray alloc] initWithCount:DataProviderDataCount maxObjectsPerPage:pageSize];
         _pagedArray.delegate = self;
         _dataLoadingOperations = [NSMutableDictionary dictionary];
         _operationQueue = [NSOperationQueue new];
@@ -44,10 +44,10 @@ const NSUInteger DataProviderDataCount = 200;
 
 #pragma mark - Accessors
 - (NSUInteger)loadedCount {
-    return _pagedArray.pages.count*_pagedArray.objectsPerPage;
+    return _pagedArray.pages.count*_pagedArray.maxObjectsPerPage;
 }
 - (NSUInteger)pageSize {
-    return _pagedArray.objectsPerPage;
+    return _pagedArray.maxObjectsPerPage;
 }
 - (NSArray *)dataObjects {
     return (NSArray *)_pagedArray;

@@ -26,7 +26,7 @@
 
 @implementation AWPagedArray {
     NSUInteger _totalCount;
-    NSUInteger _objectsPerPage;
+    NSUInteger _maxObjectsPerPage;
     NSMutableDictionary *_pages;
     
     BOOL _needsUpdateProxiedArray;
@@ -35,45 +35,45 @@
 
 #pragma mark - Public methods
 #pragma mark Initialization
-- (instancetype)initWithCount:(NSUInteger)count objectsPerPage:(NSUInteger)objectsPerPage initialPageIndex:(NSInteger)initialPageIndex {
+- (instancetype)initWithCount:(NSUInteger)count maxObjectsPerPage:(NSUInteger)maxObjectsPerPage initialPageIndex:(NSInteger)initialPageIndex {
     
     _totalCount = count;
-    _objectsPerPage = objectsPerPage;
+    _maxObjectsPerPage = maxObjectsPerPage;
     _pages = [[NSMutableDictionary alloc] initWithCapacity:[self numberOfPages]];
     _initialPageIndex = initialPageIndex;
     
     return self;
 }
-- (instancetype)initWithCount:(NSUInteger)count objectsPerPage:(NSUInteger)objectsPerPage {
-    return [self initWithCount:count objectsPerPage:objectsPerPage initialPageIndex:1];
+- (instancetype)initWithCount:(NSUInteger)count maxObjectsPerPage:(NSUInteger)maxObjectsPerPage {
+    return [self initWithCount:count maxObjectsPerPage:maxObjectsPerPage initialPageIndex:1];
 }
 
 #pragma mark Accessing data
 - (void)setObjects:(NSArray *)objects forPage:(NSUInteger)page {
     
     // Make sure object count is correct
-    NSAssert((objects.count == _objectsPerPage || page == [self _lastPageIndex]), @"Expected object count per page: %ld received: %ld", (unsigned long)_objectsPerPage, (unsigned long)objects.count);
+    NSAssert((objects.count <= _maxObjectsPerPage || page == [self _lastPageIndex]), @"Expected object count per page: %ld received: %ld", (unsigned long)_maxObjectsPerPage, (unsigned long)objects.count);
     
     _pages[@(page)] = objects;
     _needsUpdateProxiedArray = YES;
 }
 - (NSUInteger)pageForIndex:(NSUInteger)index {
-    return index/_objectsPerPage + _initialPageIndex;
+    return index/_maxObjectsPerPage + _initialPageIndex;
 }
 - (NSIndexSet *)indexSetForPage:(NSUInteger)page {
     NSParameterAssert(page < _initialPageIndex+[self numberOfPages]);
     
-    NSUInteger rangeLength = _objectsPerPage;
+    NSUInteger rangeLength = _maxObjectsPerPage;
     if (page == [self _lastPageIndex]) {
-        rangeLength = (_totalCount % _objectsPerPage) ?: _objectsPerPage;
+        rangeLength = (_totalCount % _maxObjectsPerPage) ?: _maxObjectsPerPage;
     }
-    return [NSIndexSet indexSetWithIndexesInRange:NSMakeRange((page - _initialPageIndex) * _objectsPerPage, rangeLength)];
+    return [NSIndexSet indexSetWithIndexesInRange:NSMakeRange((page - _initialPageIndex) * _maxObjectsPerPage, rangeLength)];
 }
 - (NSDictionary *)pages {
     return _pages;
 }
 - (NSUInteger)numberOfPages {
-    return ceil((CGFloat)_totalCount/_objectsPerPage);
+    return ceil((CGFloat)_totalCount/_maxObjectsPerPage);
 }
 
 #pragma mark - NSArray overrides
@@ -139,7 +139,7 @@
 }
 - (NSArray *)_placeholdersForPage:(NSUInteger)page {
     
-    NSMutableArray *placeholders = [[NSMutableArray alloc] initWithCapacity:_objectsPerPage];
+    NSMutableArray *placeholders = [[NSMutableArray alloc] initWithCapacity:_maxObjectsPerPage];
     
     NSUInteger pageLimit = [[self indexSetForPage:page] count];
     for (NSUInteger i = 0; i < pageLimit; ++i) {
