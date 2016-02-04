@@ -58,7 +58,18 @@
     _needsUpdateProxiedArray = YES;
 }
 - (NSUInteger)pageForIndex:(NSUInteger)index {
-    return index/_maxObjectsPerPage + _initialPageIndex;
+    NSUInteger currentPage = 0;
+    NSUInteger totalCount  = 0;
+    
+    do {
+        NSArray *objectsForPage       = _pages[@(currentPage)];
+        NSUInteger objectCountForPage = objectsForPage ? [objectsForPage count] : _maxObjectsPerPage;
+        
+        totalCount += objectCountForPage;
+        currentPage ++;
+    } while (totalCount <= index && currentPage < [self _lastPageIndex]);
+    
+    return currentPage;
 }
 - (NSIndexSet *)indexSetForPage:(NSUInteger)page {
     NSParameterAssert(page < _initialPageIndex+[self numberOfPages]);
